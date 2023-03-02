@@ -1,5 +1,6 @@
 from typing import TypeVar, Generic, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session , joinedload
+
 
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
@@ -9,6 +10,9 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request, HTTPException
+from model import Product , Users
+import pdb
+
 
 
 T = TypeVar('T')
@@ -19,14 +23,49 @@ class BaseRepo():
     @staticmethod
     def retrieve_all(db: Session, model: Generic[T]):
         return db.query(model).all()
-
+    
+    @staticmethod
+    def retrieve_all_product(db: Session, model: Generic[T]):
+        return db.query(model).all()
+    
+    @staticmethod
+    def get_all_table(db: Session,Product:Product,Users:Users):
+       sql =  db.query(Product).options(joinedload(Product.owner).joinedload(Users.username)).all
+       
+       return sql
+    
     @staticmethod
     def retrieve_by_id(db: Session, model: Generic[T], id: int):
         return db.query(model).filter(model.id == id).all()
     
     @staticmethod
-    def delete_by_id(db: Session, model: Generic[T] ,id: int):
-        return db.query(model).filter(model.id == id).first()
+    def delete_by_id(db: Session, model: Generic[T],id: int):
+        return db.query(model).filter(model.product_id == id).first()
+    
+    @staticmethod
+    def delete_by_name(db: Session, model: Generic[T],productname: str):
+        return db.query(model).filter(model.productname == productname).first()
+    
+    @staticmethod
+    def update_by_id(db: Session, model: Generic[T],price: str,id:int):
+        sql =  db.query(model).filter(model.id == id).first()
+        sql.price = price
+        return sql
+    
+    @staticmethod
+    def update_all(db: Session, model: Generic[T],price: str,id:int ,productname:str ,desc:str ,owner:str):
+        sql =  db.query(model).filter(model.id == id).first()
+        sql.price = price
+        sql.productname = productname
+        sql.desc = desc
+        sql.owner = owner
+
+        return sql
+    
+    
+   
+
+    
     
 
     @staticmethod
@@ -47,9 +86,9 @@ class BaseRepo():
 
 
 class UsersRepo(BaseRepo):
-    
-    @staticmethod
-    def find_by_username(db:Session, model: Generic[T], username: str):
+     
+    @staticmethod 
+    def find_by_username(db:Session, model: Generic [T], username: str):
         return db.query(model).filter(model.username == username).first()
     
 

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends
-from schema import RequestSchema, ResponseSchema, TokenResponse, UserSigupSchema, UserSiginSchema ,ProductSchema,DeleteProduct
+from schema import RequestSchema, ResponseSchema, TokenResponse, UserSigupSchema, UserSiginSchema , ProductSchema,DeleteProduct,DeleteNameProduct,Userproductjoin ,UpdatePrice,UpdateAllProduct
 from sqlalchemy.orm import Session
 from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
 from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo , BaseRepo
 from model import Users,Product
 from datetime import datetime, timedelta
-import pdb
+
 
 router = APIRouter()
 
@@ -81,15 +81,21 @@ async def retrieve_all(db: Session = Depends(get_db)):
     product Router
 
 """
+@router.get("/allproduct")
+async def retrieve_all_product(db: Session = Depends(get_db)):
+    product = BaseRepo.retrieve_all(db, Product)
+    return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)
+    
+
 @router.post('/insert')
 async def insert(request: ProductSchema, db: Session = Depends(get_db)):
     try:
         # insert user to db
         _product = Product(
-                      product_id=request.product_id,
                       productname=request.productname,
                       desc=request.desc,
                       price=request.price,
+                      owner=request.owner
                       )
         BaseRepo.insert(db, _product)
         return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
@@ -97,16 +103,54 @@ async def insert(request: ProductSchema, db: Session = Depends(get_db)):
         print(error.args)
         return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
     
+
 @router.delete('/delete')
-async def delete(request: DeleteProduct, db: Session = Depends(get_db)):
+async def delete_product_name(request: DeleteNameProduct, db: Session = Depends(get_db)):
     try:
-        # delete User by id
-        pdb.set_trace()
-        _delete = BaseRepo.delete_by_id(db,DeleteProduct,request.product_id)
+        # delete User by name
+        
+        _delete = BaseRepo.delete_by_name(db,Product,request.productname)
         
         BaseRepo.delete(db,_delete)  
         return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
     except Exception as error:
         print(error.args)
         return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
+    
 
+@router.patch('/Update')
+async def update(request: UpdatePrice, db: Session = Depends(get_db)):
+    try:
+        # delete User by name
+        
+        _update = BaseRepo.update_by_id(db,Product,request.price,request.id)
+        
+        BaseRepo.update(db,_update)  
+        return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
+    except Exception as error:
+        print(error.args)
+        return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
+    
+@router.put('/UpdateAll')
+async def update(request: UpdateAllProduct, db: Session = Depends(get_db)):
+    try:
+        # delete User by name
+        
+        _updateall = BaseRepo.update_all(db,Product,request.price,request.id,request.productname,request.desc,request.owner)
+        
+        BaseRepo.update(db,_updateall)  
+        return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
+    except Exception as error:
+        print(error.args)
+        return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
+    
+    
+"""
+    join table
+
+"""
+
+@router.get('/Join2table')
+async def all_table(db: Session = Depends(get_db)):
+    product = BaseRepo.get_all_table(db,Product,Users)
+    return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)
