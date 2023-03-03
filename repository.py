@@ -1,5 +1,6 @@
 from typing import TypeVar, Generic, Optional
 from sqlalchemy.orm import Session , joinedload
+from sqlalchemy import desc
 
 
 from datetime import datetime, timedelta
@@ -23,15 +24,16 @@ class BaseRepo():
     @staticmethod
     def retrieve_all(db: Session, model: Generic[T]):
         return db.query(model).all()
-    
+    #orderby / offset / limit
     @staticmethod
-    def retrieve_all_product(db: Session, model: Generic[T]):
-        return db.query(model).all()
+    def retrieve_all_product(db: Session, model: Generic[T],limit:int,skip:int):
+        sql =  db.query(model).order_by(desc(model.productname)).offset(skip).limit(limit).all()
+        return sql
+  
     
     @staticmethod
     def get_all_table(db: Session,Product:Product,Users:Users):
-       sql =  db.query(Product).options(joinedload(Product.owner).joinedload(Users.username)).all
-       
+       sql =  db.query(Product,Users).join(Users).all()
        return sql
     
     @staticmethod
@@ -53,7 +55,7 @@ class BaseRepo():
         return sql
     
     @staticmethod
-    def update_all(db: Session, model: Generic[T],price: str,id:int ,productname:str ,desc:str ,owner:str):
+    def update_all(db: Session, model: Generic[T],price: str,id:int ,productname:str ,desc:str ,owner:int):
         sql =  db.query(model).filter(model.id == id).first()
         sql.price = price
         sql.productname = productname

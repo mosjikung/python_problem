@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from typing import List
 from schema import RequestSchema, ResponseSchema, TokenResponse, UserSigupSchema, UserSiginSchema , ProductSchema,DeleteProduct,DeleteNameProduct,Userproductjoin ,UpdatePrice,UpdateAllProduct
 from sqlalchemy.orm import Session
 from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -6,6 +7,7 @@ from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo , BaseRepo
 from model import Users,Product
 from datetime import datetime, timedelta
+import pdb
 
 
 router = APIRouter()
@@ -82,9 +84,10 @@ async def retrieve_all(db: Session = Depends(get_db)):
 
 """
 @router.get("/allproduct")
-async def retrieve_all_product(db: Session = Depends(get_db)):
-    product = BaseRepo.retrieve_all(db, Product)
+async def retrieve_all_product(limit:int, skip:int ,db: Session = Depends(get_db)):
+    product = BaseRepo.retrieve_all_product(db, Product , limit, skip)
     return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)
+    
     
 
 @router.post('/insert')
@@ -153,4 +156,6 @@ async def update(request: UpdateAllProduct, db: Session = Depends(get_db)):
 @router.get('/Join2table')
 async def all_table(db: Session = Depends(get_db)):
     product = BaseRepo.get_all_table(db,Product,Users)
+    pdb.set_trace()
     return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)
+    

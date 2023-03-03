@@ -45,8 +45,7 @@ class ProductSchema(BaseModel):
     productname: str
     desc: str
     price: str
-    owner: str
-
+    owner: int
 
 class DeleteProduct(BaseModel):
     product_id:int

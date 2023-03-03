@@ -35,7 +35,7 @@ class Product(Base):
     productname = Column(String)
     desc = Column(String)
     price = Column(String)
-    owner = Column(String)
+    owner = Column(Integer, ForeignKey('users.id'))
 
    # Users = relationship("Users", back_populates="Product")
 
