@@ -1,5 +1,4 @@
-import email
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, PrimaryKeyConstraint
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, PrimaryKeyConstraint,ForeignKey ,UniqueConstraint
 from sqlalchemy.orm import relationship
 from config import Base
 import datetime
@@ -30,10 +29,13 @@ class Users(Base):
 class Product(Base):
     __tablename__ = 'product'
 
-    product_id = Column(String,primary_key=True)
+    id = Column(Integer, primary_key=True)
     productname = Column(String)
     desc = Column(String)
     price = Column(String)
+    owner = Column(Integer, ForeignKey('users.id'))
+
+   # Users = relationship("Users", back_populates="Product")
 
     users = relationship("Users", back_populates="product")
 

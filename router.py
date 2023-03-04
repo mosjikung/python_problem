@@ -16,6 +16,7 @@ from model import Users, Product
 from datetime import datetime, timedelta
 
 
+
 router = APIRouter()
 
 # encrypt password
@@ -119,9 +120,13 @@ async def retrieve_all(db: Session = Depends(get_db)):
     product Router
 
 """
+@router.get("/allproduct")
+async def retrieve_all_product(limit:int, skip:int ,db: Session = Depends(get_db)):
+    product = BaseRepo.retrieve_all_product(db, Product , limit, skip)
+    return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)
+    
+    
 
-
-@router.post("/insert")
 async def insert(request: ProductSchema, db: Session = Depends(get_db)):
     try:
         # insert user to db
@@ -157,3 +162,41 @@ async def delete(request: DeleteProduct, db: Session = Depends(get_db)):
         return ResponseSchema(
             code="500", status="Error", message="Internal Server Error"
         ).dict(exclude_none=True)
+
+@router.patch('/Update')
+async def update(request: UpdatePrice, db: Session = Depends(get_db)):
+    try:
+        # delete User by name
+        
+        _update = BaseRepo.update_by_id(db,Product,request.price,request.id)
+        
+        BaseRepo.update(db,_update)  
+        return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
+    except Exception as error:
+        print(error.args)
+        return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
+    
+@router.put('/UpdateAll')
+async def update(request: UpdateAllProduct, db: Session = Depends(get_db)):
+    try:
+        # delete User by name
+        
+        _updateall = BaseRepo.update_all(db,Product,request.price,request.id,request.productname,request.desc,request.owner)
+        
+        BaseRepo.update(db,_updateall)  
+        return ResponseSchema(code="200", status="Ok", message="Success save data").dict(exclude_none=True)
+    except Exception as error:
+        print(error.args)
+        return ResponseSchema(code="500", status="Error", message="Internal Server Error").dict(exclude_none=True)
+    
+    
+"""
+    join table
+
+"""
+
+@router.get('/Join2table')
+async def all_table(db: Session = Depends(get_db)):
+    product = BaseRepo.get_all_table(db,Product,Users)
+    pdb.set_trace()
+    return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result= product).dict(exclude_none=True)

@@ -42,14 +42,33 @@ class TokenResponse(BaseModel):
 
     
 class ProductSchema(BaseModel):
-    product_id:str
     productname: str
     desc: str
     price: str
-
+    owner: int
 
 class DeleteProduct(BaseModel):
-    product_id:str
+    product_id:int
+
+
+class DeleteNameProduct(BaseModel):
+    productname:str
+
+class Userproductjoin(BaseModel):
+    owner:str
+
+class UpdatePrice(BaseModel):
+    id:int
+    price:str
+
+class UpdateAllProduct(BaseModel):
+    id:int
+    price:str
+    productname:str
+    owner:str
+    desc:str
+
+
     
     
 #หน้า schema คือ Request Body
