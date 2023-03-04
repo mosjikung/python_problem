@@ -11,7 +11,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-	"https://nrc-management.xcoshop.com",
+    "https://nrc-management.xcoshop.com",
 ]
 
 app.add_middleware(
@@ -22,10 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get('/')
+
+@app.get("/")
 async def Home():
     return "Welcome Home"
 
 
 app.include_router(router.router)
-
