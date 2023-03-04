@@ -6,16 +6,23 @@ from jose import JWTError, jwt
 from config import SECRET_KEY, ALGORITHM
 
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends
+from fastapi import Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request, HTTPException
+from model import Product
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
-class BaseRepo():
-
+class BaseRepo:
+    """
+    CRUD
+    C = Create
+    R = Read
+    U = update
+    D = Delete
+    """
     @staticmethod
     def retrieve_all(db: Session, model: Generic[T]):
         return db.query(model).all()
@@ -23,11 +30,10 @@ class BaseRepo():
     @staticmethod
     def retrieve_by_id(db: Session, model: Generic[T], id: int):
         return db.query(model).filter(model.id == id).all()
-    
+
     @staticmethod
-    def delete_by_id(db: Session, model: Generic[T] ,id: int):
-        return db.query(model).filter(model.id == id).first()
-    
+    def delete_by_id(db: Session, model: Generic[T], id: int):
+        return db.query(model).filter(model.product_id == id).first()
 
     @staticmethod
     def insert(db: Session, model: Generic[T]):
@@ -47,25 +53,31 @@ class BaseRepo():
 
 
 class UsersRepo(BaseRepo):
-    
     @staticmethod
-    def find_by_username(db:Session, model: Generic[T], username: str):
+    def find_by_username(db: Session, model: Generic[T], username: str):
         return db.query(model).filter(model.username == username).first()
-    
 
 
-
-class JWTRepo():
-
+class JWTRepo:
     def generate_token(data: dict, expires_delta: Optional[timedelta] = None):
+        """
+        to_encode = {
+            "id": user_id,
+            "sub": user_name,
+            "exp": expire
+        }
+        """
         to_encode = data.copy()
+
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
+
         to_encode.update({"exp": expire})
+
         encode_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        
+
         return encode_jwt
 
     def decode_token(token: str):
@@ -73,28 +85,30 @@ class JWTRepo():
             decode_token = jwt.decode(token, SECRET_KEY, algorithm=[ALGORITHM])
             return decode_token if decode_token["expires"] >= datetime.time() else None
         except:
-            return{}
+            return {}
 
 
 class JWTBearer(HTTPBearer):
-
     def __init__(self, auto_error: bool = True):
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
+        credentials: HTTPAuthorizationCredentials = await super(
+            JWTBearer, self
+        ).__call__(request)
 
         if credentials:
             if not credentials.scheme == "Bearer":
                 raise HTTPException(
-                    status_code=403, detail="Invalid authentication sheme.")
+                    status_code=403, detail="Invalid authentication sheme."
+                )
             if self.verfity_jwt(credentials.credentials):
                 raise HTTPException(
-                    status_code=403, detail="Invalid token or expiredd token.")
+                    status_code=403, detail="Invalid token or expiredd token."
+                )
             return credentials.credentials
         else:
-            raise HTTPException(
-                status=403, detail="Invalid authorization code.")
+            raise HTTPException(status=403, detail="Invalid authorization code.")
 
     def verfity_jwt(Self, jwttoken: str):
         isTokenValid: bool = False

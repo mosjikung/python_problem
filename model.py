@@ -1,5 +1,6 @@
 import email
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, PrimaryKeyConstraint
+from sqlalchemy.orm import relationship
 from config import Base
 import datetime
 
@@ -23,6 +24,8 @@ class Users(Base):
     create_date = Column(DateTime, default=datetime.datetime.now())
     update_date = Column(DateTime)
 
+    product = relationship("Product", back_populates="users")
+
 
 class Product(Base):
     __tablename__ = 'product'
@@ -31,5 +34,7 @@ class Product(Base):
     productname = Column(String)
     desc = Column(String)
     price = Column(String)
+
+    users = relationship("Users", back_populates="product")
 
 #model คือตัวแทน Table
