@@ -50,13 +50,39 @@ class BaseRepo:
     def get_all_table(db: Session, Product: Product, Users: Users):
         # Reference DOC
         # https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query.join
-        results = db.query(Product).select_from(Users).join(Users.product)
+
+
+        #results = db.query(Product).select_from(Users).join(Users.product)
 
         # Can use filter like WHERE user.id == 2
         #results = db.query(Product).select_from(Users).join(Users.product).filter(Users.id == 2)
 
         #results = db.query(Users).join(Product, Users.id == Product.owner_id)
-        return results.all()
+        #return results.all()
+
+        results = db.query(Product, Users).join(Product).all()
+        results_dict = []
+
+# add the results to the dictionary
+        for product, user in results:
+            results_dict.append({
+                'product_id': product.id,
+                'productname ': product.productname,
+                'desc': product.desc,
+                'price': product.price,
+                'owner_id': product.owner_id,
+                'user_id': user.id,
+                'username': user.username,
+                'password': user.password,
+                'email': user.email,
+                'phone_number': user.phone_number,
+                'first_name': user.first_name,
+                'last_name ': user.last_name,
+                'create_date': user.create_date,
+            })
+
+        return results_dict
+
 
     @staticmethod
     def retrieve_by_id(db: Session, model: Generic[T], id: int):
