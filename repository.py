@@ -48,8 +48,15 @@ class BaseRepo:
 
     @staticmethod
     def get_all_table(db: Session, Product: Product, Users: Users):
-        sql = db.query(Product,Users).join(Users,Product.owner_id == Users.id).all()
-        return sql
+        # Reference DOC
+        # https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query.join
+        results = db.query(Product).select_from(Users).join(Users.product)
+
+        # Can use filter like WHERE user.id == 2
+        #results = db.query(Product).select_from(Users).join(Users.product).filter(Users.id == 2)
+
+        #results = db.query(Users).join(Product, Users.id == Product.owner_id)
+        return results.all()
 
     @staticmethod
     def retrieve_by_id(db: Session, model: Generic[T], id: int):

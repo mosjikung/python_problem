@@ -225,7 +225,7 @@ async def update(request: UpdateAllProduct, db: Session = Depends(get_db)):
 
 @router.get("/Join2table")
 async def all_table(db: Session = Depends(get_db)):
-    result = BaseRepo.get_all_table(db, Product, Users)
+    results = BaseRepo.get_all_table(db, Product, Users)
     # last_result = []
     # for username , productname , owner_id in result:
     #     last_result.append({
@@ -234,9 +234,9 @@ async def all_table(db: Session = Depends(get_db)):
     #         'owner_id':owner_id
     #     })
 
-    # return last_result
+    
     return ResponseSchema(
-        code="200", status="Ok", message="Sucess retrieve data", result=product
+        code="200", status="Ok", message="Sucess retrieve data", result=results
     ).dict(exclude_none=True)
        
         
