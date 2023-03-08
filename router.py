@@ -21,7 +21,7 @@ from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
 from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo, BaseRepo
 
-from model import Users, Product
+from model import Users, Product ,Productstatus
 from datetime import datetime, timedelta
 import pdb
 import json
@@ -141,7 +141,7 @@ async def insert(request: ProductSchema, db: Session = Depends(get_db)):
             productname=request.productname,
             desc=request.desc,
             price=request.price,
-            owner=request.owner,
+            owner_id=request.owner_id,
         )
         BaseRepo.insert(db, _product)
         return ResponseSchema(
@@ -225,27 +225,38 @@ async def update(request: UpdateAllProduct, db: Session = Depends(get_db)):
 
 @router.get("/Join2table")
 async def all_table(db: Session = Depends(get_db)):
-    result = BaseRepo.get_all_table(db, Product, Users)
-    # last_result = []
-    # for username , productname , owner_id in result:
-    #     last_result.append({
-    #         'username':username,
-    #         'productname':productname,
-    #         'owner_id':owner_id
-    #     })
+    results = BaseRepo.get_all_table(db, Product, Users ,Productstatus)
 
-    # return last_result
+    results_dict =[]
+    for product, user in results:
+            results_dict.append({
+                'product_id': product.id,
+                'productname ': product.productname,
+                'desc': product.desc,
+                'price': product.price,
+                'owner_id': product.owner_id,
+                'user_id': user.id,
+                'username': user.username,
+                'password': user.password,
+                'email': user.email,
+                'phone_number': user.phone_number,
+                'first_name': user.first_name,
+                'last_name ': user.last_name,
+                'create_date': user.create_date,
+            })
+
+    
     return ResponseSchema(
-        code="200", status="Ok", message="Sucess retrieve data", result=product
+        code="200", status="Ok", message="Sucess retrieve data", result=results_dict 
     ).dict(exclude_none=True)
        
         
         
-@router.post("/users/{user_id}/product")
+@router.post("/users/product/{statuscheck}/")
 def create_item_for_user(
-    user_id: int, product: ProductSchema, db: Session = Depends(get_db)
+     product: ProductSchema, statuscheck:int ,  db: Session = Depends(get_db)
 ):
-    product = BaseRepo.insert_product_user(db, Product, product, user_id)
+    product = BaseRepo.insert_product_user(db, Product, product,statuscheck)
     return ResponseSchema(
         code="200", status="Ok", message="Sucess retrieve data", result=product
     ).dict(exclude_none=True)
