@@ -228,7 +228,7 @@ async def all_table(db: Session = Depends(get_db)):
     results = BaseRepo.get_all_table(db, Product, Users ,Productstatus)
 
     results_dict =[]
-    for product, user in results:
+    for product, user,productstatus in results:
             results_dict.append({
                 'product_id': product.id,
                 'productname ': product.productname,

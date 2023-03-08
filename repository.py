@@ -2,7 +2,6 @@ from typing import TypeVar, Generic, Optional
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import desc
 
-
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from config import SECRET_KEY, ALGORITHM
