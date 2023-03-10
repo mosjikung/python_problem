@@ -11,7 +11,7 @@ from fastapi import Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request, HTTPException
 
-from model import Product, Users , Productstatus
+from model import Product, Users
 from schema import ProductSchema
 
 import pdb
@@ -46,25 +46,26 @@ class BaseRepo:
         return sql
 
     @staticmethod
-    def get_all_table(db: Session, Product: Product, Users: Users ,Productstatus: Productstatus):
-        
+    def get_all_table(db: Session, Product: Product, Users: Users):
+
         # Reference DOC
         # https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query.join
 
-
-       # results = db.query(Product,Users,Productstatus).select_from(Users).join(Users.product).select_from(Productstatus.productx).all()
+        # results = db.query(Product,Users,Productstatus).select_from(Users).join(Users.product).select_from(Productstatus.productx).all()
 
         # Can use filter like WHERE user.id == 2
-        #results = db.query(Product).select_from(Users).join(Users.product).filter(Users.id == 2)
+        # results = db.query(Product).select_from(Users).join(Users.product).filter(Users.id == 2)
 
-        #results = db.query(Users).join(Product, Users.id == Product.owner_id).all()
-        #return results.all()
+        # results = db.query(Users).join(Product, Users.id == Product.owner_id).all()
+        # return results.all()
 
-        results = db.query(Product, Users ,Productstatus).join(Product, Product.owner_id == Users.id).join(Productstatus.status_id == Product.statuscheck).all()
-     
-       
+        results = (
+            db.query(Product, Users)
+            .join(Product, Product.owner_id == Users.id)
+            .all()
+        )
+
         return results
-
 
     @staticmethod
     def retrieve_by_id(db: Session, model: Generic[T], id: int):
@@ -110,11 +111,11 @@ class BaseRepo:
 
     @staticmethod
     def insert_product_user(
-        db: Session, model: Generic[T], product: ProductSchema, statuscheck:int
+        db: Session, model: Generic[T], product: ProductSchema, statuscheck: int
     ):
-     
-        db_product = model(**product.dict() ,statuscheck=statuscheck)
-        #product.dict() = json productname,desc,price ** = all
+
+        db_product = model(**product.dict(), statuscheck=statuscheck)
+        # product.dict() = json productname,desc,price ** = all
         db.add(db_product)
         db.commit()
         db.refresh(db_product)

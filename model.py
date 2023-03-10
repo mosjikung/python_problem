@@ -19,7 +19,7 @@ class Users(Base):
     #       PrimaryKeyConstraint('id', name='countries_pkey'),
     #       {'schema': 'system'}
     #  )
-    __table_args__ = {'schema' : 'public'}
+    # __table_args__ = {'schema' : 'public'}
     id = Column(Integer, primary_key=True)
     username = Column(String)
     password = Column(String)
@@ -37,21 +37,23 @@ class Users(Base):
 
 class Product(Base):
     __tablename__ = "product"
-    __table_args__ = {'schema' : 'prod'}
+    # __table_args__ = {'schema' : 'prod'}
     id = Column(Integer, primary_key=True)
     productname = Column(String)
     desc = Column(String)
     price = Column(String)
-    owner_id = Column(Integer,ForeignKey("public.users.id"))
-    statuscheck = Column(Integer,ForeignKey("prod.productstatus.status_id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    product_status_id = Column(Integer, ForeignKey("product_status.id"))
     owner = relationship("Users", back_populates="product")
-    status = relationship("Productstatus",back_populates="productx")
+    status = relationship("Productstatus", back_populates="productx")
+
 
 class Productstatus(Base):
-    __tablename__="productstatus"
-    __table_args__ = {'schema' : 'prod'}
-    status_id = Column(Integer,primary_key=True)
+    __tablename__ = "product_status"
+    # __table_args__ = {'schema' : 'prod'}
+    id = Column(Integer, primary_key=True)
     status_name = Column(String)
-    productx = relationship("Product",back_populates="status")
+    productx = relationship("Product", back_populates="status")
+
 
 # model คือตัวแทน Table
