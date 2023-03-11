@@ -15,13 +15,14 @@ from schema import (
     UpdatePrice,
     UpdateAllProduct,
     ProductBase,
+ 
 )
 from sqlalchemy.orm import Session
 from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
 from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo, BaseRepo
 
-from model import Users, Product ,Productstatus
+from model import Users, Product , Productstatus
 from datetime import datetime, timedelta
 import pdb
 import json
@@ -243,6 +244,8 @@ async def all_table(db: Session = Depends(get_db)):
                 'first_name': user.first_name,
                 'last_name ': user.last_name,
                 'create_date': user.create_date,
+                'prductstatus_id':productstatus.id,
+                'status':productstatus.status_name
             })
 
     
