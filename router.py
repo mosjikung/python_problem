@@ -22,7 +22,7 @@ from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
 from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo, BaseRepo
 
-from model import Users, Product , Productstatus
+from model import Users, Product
 from datetime import datetime, timedelta
 import pdb
 import json

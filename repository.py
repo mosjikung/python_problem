@@ -11,7 +11,7 @@ from fastapi import Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request, HTTPException
 
-from model import Product, Users , Productstatus
+from model import Product, Users
 from schema import ProductSchema
 
 import pdb
@@ -46,7 +46,7 @@ class BaseRepo:
         return sql
 
     @staticmethod
-    def get_all_table(db: Session, Product: Product, Users: Users , Productstatus:Productstatus):
+    def get_all_table(db: Session, Product: Product, Users: Users):
 
         # Reference DOC
         # https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query.join
@@ -60,12 +60,11 @@ class BaseRepo:
         # return results.all()
 
         results = (
-            db.query(Product, Users , Productstatus)
+            db.query(Product, Users)
             .join(Product, Product.owner_id == Users.id)
-            .join(Productstatus, Productstatus.id == Product.product_status_id)
             .all()
         )
-       
+
         return results
 
     @staticmethod
